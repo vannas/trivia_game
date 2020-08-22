@@ -1,6 +1,6 @@
 <template>
     <div class="formulario row">
-        <div class="col s8 m8">
+        <div class="col offset-s2 offset-m2 s8 m8">
             <h5>New Question</h5>
             <!--Creo un formulario para ingresar nuevos datos a la tabla y vinculo con v-bind @ al metodo----->
             <form @submit.prevent="addnewquestion" id="form_questions">
@@ -44,6 +44,7 @@
 <script>
 import { db } from '../firebase';  
 import router from "@/router";
+import M from "materialize-css";
 
 export default {
     name: 'Questions',
@@ -56,6 +57,12 @@ export default {
       fake3: ''
     }
   },
+  user() {
+    if (this.$store.state.user == 'null'){
+        router.push('/login');
+    }
+    return this.$store.state.user;
+    },
   methods: {
       addnewquestion() {
         let answers_randomized= [
@@ -69,15 +76,16 @@ export default {
         db.collection('trivia_vault').add({
             question: this.new_question,
             answers: answers_randomized
-        });
-
+        })
+        .then(() =>  {
+                M.toast({html: `Question added to the game. Thank you!`, classes: `rounded light-green`})
+                router.push('/')
+        })
         this.new_question = '';
         this.correct = '';
         this.fake1 = '';
         this.fake2 = '';
         this.fake3 = '';
-
-        router.push('/');
     }
   },
   firestore() {

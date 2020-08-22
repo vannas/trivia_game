@@ -3,107 +3,34 @@
         <h1>Trivia Game</h1>
         <form @submit.prevent="new_game">
             
-            <!---
             <div class="question">
-                <form action="#" v-for="question in randomize_questions" :key="question.id">
+                <div v-for="(question, i) in randomize_questions.slice(0,3)" :key="question.id">
                     <span>{{question.question}} </span>
                     <p>
                         <label>
-                            <input name="radiosgroup1" type="radio" v-model="answer1"/> 
-                            <span v-for="(answer, i) in randomize_answers" :key="i"> {{answer.text}} </span>
-                        </label>
-                    </p>
-                </form>
-            </div>
-            --->           
-            
-            <div class="question1">
-                <form action="#">
-                    <span>{{questions[0].question}} </span>
-                    <p>
-                        <label for="radio-1A">
-                            <input name="radiosgroup1" type="radio" value="radio-1" id="radio-1A" v-model="answer1"/> 
-                            <span>{{questions[0].answers[0].text}}</span>
+                            <input :name="question.id" type="radio" :value="question.answers[0].correct ? 'OK' :'NO'" v-model="form.answers[i]" required="required"/> 
+                            <span>{{question.answers[0].text}}</span>
                         </label>
                     </p>
                     <p>
-                        <label for="radio-2A">
-                            <input name="radiosgroup1" type="radio" value="radio-2" id="radio-2A" v-model="answer1"/>
-                            <span>{{questions[0].answers[1].text}}</span>
+                        <label>
+                            <input :name="question.id" type="radio" :value="question.answers[1].correct ? 'OK' :'NO'" v-model="form.answers[i]" required="required"/>
+                            <span>{{question.answers[1].text}}</span>
                         </label>
                     </p>
                     <p>
-                        <label for="radio-3A">
-                            <input name="radiosgroup1" type="radio" value="radio-3" id="radio-3A" v-model="answer1"/> 
-                            <span>{{questions[0].answers[2].text}}</span>
+                        <label>
+                            <input :name="question.id" type="radio" :value="question.answers[2].correct ? 'OK' :'NO'" v-model="form.answers[i]" required="required"/> 
+                            <span>{{question.answers[2].text}}</span>
                         </label>
                     </p>
                     <p>
-                        <label for="radio-4A">
-                            <input name="radiosgroup1" type="radio" value="radio-4" id="radio-4A" v-model="answer1"/> 
-                            <span>{{questions[0].answers[3].text}}</span>
+                        <label>
+                            <input :name="question.id" type="radio" :value="question.answers[3].correct ? 'OK' :'NO'" v-model="form.answers[i]" required="required"/> 
+                            <span>{{question.answers[3].text}}</span>
                         </label>
                     </p>
-                </form>
-            </div>
-
-            <div class="question2">
-                <form action="#">
-                <span>{{questions[1].question}} </span>
-                <p>
-                    <label for="radio-1B">
-                        <input name="radiosgroup2" type="radio" value="radio-1" id="radio-1B"/> 
-                        <span>{{questions[1].answers[0].text}}</span>
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-2B">
-                        <input name="radiosgroup2" type="radio" value="radio-2" id="radio-2B"/>
-                        <span>{{questions[1].answers[1].text}}</span>
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-3B">
-                        <input name="radiosgroup2" type="radio" value="radio-3" id="radio-3B"/> 
-                        <span>{{questions[1].answers[2].text}}</span>
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-4B">
-                        <input name="radiosgroup2" type="radio" value="radio-4" id="radio-4B"/>
-                        <span>{{questions[1].answers[3].text}}</span>
-                    </label>
-                </p>
-                </form>
-            </div>
-
-            <div class="question3">
-                <span>{{questions[2].question}} </span>
-
-                <p>
-                    <label for="radio-1C">
-                        <input name="radiosgroup3" type="radio" value="radio-1" id="radio-1C"/>
-                        <span>{{questions[2].answers[0].text}}</span>
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-2C">
-                        <input name="radiosgroup3" type="radio" value="radio-2" id="radio-2C"/>
-                        <span>{{questions[2].answers[1].text}}</span>
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-3C">
-                        <input name="radiosgroup3" type="radio" value="radio-3" id="radio-3C"/> 
-                        <span>{{questions[2].answers[2].text}}</span>                        
-                    </label>
-                </p>
-                <p>
-                    <label for="radio-4C">
-                        <input name="radiosgroup3" type="radio" value="radio-4" id="radio-4C"/>
-                        <span>{{questions[2].answers[3].text}}</span>
-                    </label>                    
-                </p>
+                </div>
             </div>
        
         <div class="input-field">
@@ -117,50 +44,79 @@
 <script>
 import { db } from '@/firebase'
 import 'firebase/auth';
-//import router from "@/router";
+import firebase from 'firebase/app'
+import router from "@/router";
+import M from "materialize-css";
 
 export default {
     name: 'Game',
     data() {
     return {
       questions: [],
-      answers: [],
-      answer1: '',
-      answer2: '',
-      answer3: ''
+      form: {
+          answers: []
+      }
     }
   },
   computed: {
-      randomize_questions() {
-          let questions= [...this.questions];
-          questions.sort(() => 0.5 - Math.random());
-          return questions;
-      },
-
-      /*randomize_answers() {
-          let possible_answers= [...answers.text];
-          possible_answers.sort(() => 0.5 - Math.random());
-          return possible_answers;
-      }*/
+    user() {
+        return this.$store.state.user;
+    },
+    randomize_questions() {
+        let questions= [...this.questions];
+        questions.sort(() => 0.5 - Math.random());
+        return questions;
+    },
   },
-  methods: {
-    new_game() {        
-        
+    methods: {
+        new_game() {   
+            var user = firebase.auth().currentUser;     
+            let score = 0;
+            let percentage = 0;
+
+            if(this.form.answers[0] == 'OK'){ 
+                score++
+            }
+            if(this.form.answers[1]== 'OK'){
+                score++
+            }
+            if(this.form.answers[2]== 'OK'){
+                score++
+            }
+
+            percentage = (score / 3) * 100
+            percentage = percentage.toFixed(1)
+
+            let date= new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', hour12: true};
+            const currentDate = date.toLocaleDateString("es-CL", options);
+
+            db.collection('games').add({
+                player:user.displayName,
+                percentage: `${percentage}`,
+                score: score,
+                date: currentDate
+            })
+            .then(() =>  {
+                M.toast({html: `Acertaste ${score} de 3`, classes: `rounded light-green`})
+                router.push('/fromgame')
+            })    
         }
     },
-  firestore() {
-    return {
-      questions: db.collection('trivia_vault'),
-      games: db.collection('games')
-    }
-  },
-  mounted() {
-    
+    firestore() {
+        return {
+            questions: db.collection('trivia_vault'),
+            games: db.collection('games')
+        }
     }
 }   
 
 </script>
 
-<style>
+<style scoped>
+
+.btn {
+    margin-bottom:50px;
+}
 
 </style>

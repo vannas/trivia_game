@@ -20,6 +20,14 @@ let router= new VueRouter ({
             }
         },
         {
+            path: '/fromgame',
+            name: 'fromgame',
+            component: Home,
+            meta:{
+                requiresAuth: true
+            }
+        },
+        {
             path: '/login',
             component: Login
         },
